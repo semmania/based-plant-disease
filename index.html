@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agri Expert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  🌾 Agri Expert
+  <div class="header-buttons">
+    <button id="settingsBtn">⚙️</button>
+  </div>
+</div>
+
+<!-- Settings Panel -->
+<div id="settingsPanel" class="settings hidden">
+  <h4>Settings</h4>
+  <div><label><input type="checkbox" id="darkToggle"> Dark Mode</label></div>
+  <div>
+    Language: 
+    <select id="langSelect">
+      <option value="en">EN</option>
+      <option value="ar">AR</option>
+    </select>
+  </div>
+  <div><label><input type="checkbox" id="soundToggle" checked> Sound</label></div>
+  <div><label><input type="checkbox" id="tipsToggle" checked> Tips</label></div>
+  <div><button id="infoBtn">Color Guide ℹ️</button></div>
+</div>
+
+<!-- Intro Page -->
+<div id="intro" class="page">
+  <div class="intro-card">
+    <h1 id="appName">🌱 Agri Expert</h1>
+    <p id="appDesc">Detect plant diseases and get treatment tips easily!</p>
+    <button id="continueBtn">Continue</button>
+  </div>
+</div>
+
+<!-- Welcome Page -->
+<div id="welcome" class="page hidden">
+  <div class="card">
+    <h2 id="title">Welcome 👋</h2>
+    <p id="desc">Upload a plant leaf image and we will help you detect diseases and suggest treatments easily.</p>
+    <button id="start">Start Diagnosis</button>
+  </div>
+</div>
+
+<!-- Diagnosis Page -->
+<div id="diagnosis" class="page hidden">
+  <div class="card">
+    <h2 id="uploadText">Upload Image</h2>
+    <input type="file" id="imgInput" accept="image/*">
+    <img id="preview">
+    <button id="check">Diagnose</button>
+  </div>
+  <div id="result"></div>
+</div>
+
+<!-- Color Guide Popup -->
+<div id="colorPopup" class="popup hidden">
+  <div class="popup-content">
+    <h3 id="colorTitle">Color Guide</h3>
+    <p>🔴 Fungal Infection</p>
+    <p>🟡 Nutrient Deficiency</p>
+    <p>🟢 Insect Attack</p>
+    <button id="closePopup">Close</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
+
