@@ -6,69 +6,280 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- ERROR BANNER FOR DEBUGGING -->
+<div id="errorBanner" style="position:fixed; top:0; left:0; width:100%; background:red; color:white; z-index:99999; display:none; padding:10px;"></div>
+<script>
+  window.onerror = function(msg, url, line, col, error) {
+    var banner = document.getElementById('errorBanner');
+    banner.style.display = 'block';
+    banner.innerHTML += '<br>' + msg + ' at line ' + line;
+  };
+</script>
 
-<!-- Header -->
-<div class="header">
-  🌾 Agri Expert
-  <div class="header-buttons">
-    <button id="settingsBtn">⚙️</button>
+<!-- LOGIN -->
+<div id="login" class="login-overlay">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-icon">🌱</div>
+        <h1>Agri Expert</h1>
+        <p>الخبير الزراعي</p>
+      </div>
+      <div class="input-group">
+        <label for="email">Email / البريد الإلكتروني</label>
+        <div class="input-wrapper">
+          <span class="icon">📧</span>
+          <input type="email" id="email" placeholder="example@mail.com">
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="password">Password / كلمة المرور</label>
+        <div class="input-wrapper">
+          <span class="icon">🔒</span>
+          <input type="password" id="password" placeholder="••••••••">
+        </div>
+      </div>
+      <button id="loginBtn" class="premium-btn">Login / دخول</button>
+      <div class="login-footer">
+        <p>Expert care for your plants / رعاية خبيرة لنباتاتك</p>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Settings Panel -->
-<div id="settingsPanel" class="settings hidden">
-  <h4>Settings</h4>
-  <div><label><input type="checkbox" id="darkToggle"> Dark Mode</label></div>
-  <div>
-    Language: 
-    <select id="langSelect">
-      <option value="en">EN</option>
-      <option value="ar">AR</option>
-    </select>
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden" dir="auto">
+  
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-icon active" data-page="intro" title="Home / الرئيسية">
+      <span class="emoji">🏠</span>
+      <span>Home / الرئيسية</span>
+    </div>
+    <div class="sidebar-icon" data-page="diagnosis" title="Diagnosis / فحص">
+      <span class="emoji">🔍</span>
+      <span>Diagnosis / فحص</span>
+    </div>
+    <div class="sidebar-icon" data-page="dailytip" title="Daily Tip / نصيحة اليوم">
+      <span class="emoji">💡</span>
+      <span>Daily Tip / نصيحة اليوم</span>
+    </div>
+    <div class="sidebar-icon" data-page="weather" title="Weather / الطقس">
+      <span class="emoji">🌤️</span>
+      <span>Weather / الطقس</span>
+    </div>
+    <div class="sidebar-icon" data-page="reminders" title="Reminders / تذكيرات">
+      <span class="emoji">💧</span>
+      <span>Reminders / تذكيرات</span>
+    </div>
+    <div class="sidebar-icon" data-page="garden" title="Virtual Garden / حديقتي">
+      <span class="emoji">🌱</span>
+      <span>Virtual Garden / حديقتي</span>
+    </div>
+    <div class="sidebar-icon" data-page="calendar" title="Calendar / التقويم">
+      <span class="emoji">📅</span>
+      <span>Calendar / التقويم</span>
+    </div>
+    <div class="sidebar-icon" data-page="calculator" title="Calculator / الآلة الحاسبة">
+      <span class="emoji">🧮</span>
+      <span>Calculator / الحاسبة</span>
+    </div>
+    <div class="sidebar-icon" data-page="encyclopedia" title="Encyclopedia / الموسوعة">
+      <span class="emoji">📚</span>
+      <span>Encyclopedia / الموسوعة</span>
+    </div>
+    <div class="sidebar-icon" data-page="favorites" title="Favorites / المفضلة">
+      <span class="emoji">❤️</span>
+      <span>Favorites / المفضلة</span>
+    </div>
+    <div class="sidebar-icon" data-page="notes" title="Notes / الملاحظات">
+      <span class="emoji">📝</span>
+      <span>Notes / الملاحظات</span>
+    </div>
+    <div class="sidebar-icon" data-page="profile" title="Profile / حسابي">
+      <span class="emoji">👤</span>
+      <span>Profile / حسابي</span>
+    </div>
+    <div class="sidebar-icon" id="sidebarSettingsBtn" title="Settings / الإعدادات">
+      <span class="emoji">⚙️</span>
+      <span>Settings / الإعدادات</span>
+    </div>
   </div>
-  <div><label><input type="checkbox" id="soundToggle" checked> Sound</label></div>
-  <div><label><input type="checkbox" id="tipsToggle" checked> Tips</label></div>
-  <div><button id="infoBtn">Color Guide ℹ️</button></div>
-</div>
 
-<!-- Intro Page -->
-<div id="intro" class="page">
-  <div class="intro-card">
-    <h1 id="appName">🌱 Agri Expert</h1>
-    <p id="appDesc">Detect plant diseases and get treatment tips easily!</p>
-    <button id="continueBtn">Continue</button>
-  </div>
-</div>
+  <div class="content-area">
+    <div id="floatingContainer"></div>
 
-<!-- Welcome Page -->
-<div id="welcome" class="page hidden">
-  <div class="card">
-    <h2 id="title">Welcome 👋</h2>
-    <p id="desc">Upload a plant leaf image and we will help you detect diseases and suggest treatments easily.</p>
-    <button id="start">Start Diagnosis</button>
-  </div>
-</div>
+    <div class="header">
+      <span>🌾 Agri Expert / الخبير الزراعي</span>
+    </div>
 
-<!-- Diagnosis Page -->
-<div id="diagnosis" class="page hidden">
-  <div class="card">
-    <h2 id="uploadText">Upload Image</h2>
-    <input type="file" id="imgInput" accept="image/*">
-    <img id="preview">
-    <button id="check">Diagnose</button>
-  </div>
-  <div id="result"></div>
-</div>
+    <div id="settingsPanel" class="settings hidden">
+      <h4>Settings / الإعدادات</h4>
+      <div><label><input type="checkbox" id="darkToggle"> Dark Mode / الوضع الليلي</label></div>
+      <hr style="margin: 10px 0;">
+      <button id="logoutBtn" style="background:#e63946;color:#fff;width:100%;">Logout / خروج</button>
+    </div>
 
-<!-- Color Guide Popup -->
-<div id="colorPopup" class="popup hidden">
-  <div class="popup-content">
-    <h3 id="colorTitle">Color Guide</h3>
-    <p>🔴 Fungal Infection</p>
-    <p>🟡 Nutrient Deficiency</p>
-    <p>🟢 Insect Attack</p>
-    <button id="closePopup">Close</button>
-  </div>
+    <div id="intro" class="page">
+      <div class="intro-card">
+        <h1>🌱 Agri Expert<br><span style="font-size:24px;">الخبير الزراعي</span></h1>
+        <p id="introText">Detect plant diseases easily!<br>اكتشف أمراض النباتات بسهولة!</p>
+        <button id="continueBtn">Continue / استمرار</button>
+      </div>
+    </div>
+
+    <div id="welcome" class="page hidden">
+      <button class="back" onclick="goBack('intro')">⬅ Back / رجوع</button>
+      
+      <div class="card" style="margin-bottom: 20px;">
+        <h2 id="welcomeTitle">Welcome / مرحباً 👋</h2>
+        <p id="desc">
+          Upload a plant leaf image and we will help you detect diseases and suggest treatments easily.<br>
+          قم برفع صورة لورقة النبات وسنساعدك في اكتشاف الأمراض واقتراح العلاج بسهولة.
+        </p>
+        <button id="start">Start Diagnosis / ابدأ الفحص</button>
+      </div>
+    </div>
+
+    <div id="diagnosis" class="page hidden">
+      <button class="back" onclick="goBack('welcome')">⬅ Back / رجوع</button>
+      <div class="card">
+        <h2 id="uploadTitle">Upload Image / رفع صورة</h2>
+        <input type="file" id="imgInput" accept="image/*" style="margin-bottom:10px;">
+        <img id="preview">
+        <button id="check">Diagnose / فحص</button>
+      </div>
+      <div id="result"></div>
+    </div>
+
+    <!-- NEW WIDGET PAGES -->
+    <div id="dailytip" class="page hidden">
+      <h2>💡 Tip of the Day / نصيحة اليوم</h2>
+      <div id="dailyTipCard" class="daily-tip-card" style="width: 90%; max-width: 400px; margin-top:20px;">
+        <p id="dailyTipText" style="font-size: 16px; margin: 0; line-height: 1.5;"></p>
+      </div>
+    </div>
+
+    <div id="weather" class="page hidden">
+      <h2>🌤️ Weather / الطقس</h2>
+      <div class="card" style="width: 90%; max-width: 400px; margin-top:20px;">
+        <div id="weatherInfo">Loading... / جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div id="reminders" class="page hidden">
+      <h2>💧 Watering Reminders / تذكيرات الري</h2>
+      <div class="card" style="width: 90%; max-width: 400px; margin-top:20px;">
+        <div id="remindersList" style="margin-bottom: 10px;"></div>
+        <div style="display:flex; gap:5px;">
+          <input type="text" id="remName" placeholder="Plant / النبات" style="flex:1; padding:5px; border-radius:5px; border:1px solid #ccc;">
+          <input type="number" id="remDays" placeholder="Days / أيام" style="width:70px; padding:5px; border-radius:5px; border:1px solid #ccc;">
+          <button id="addRemBtn" style="padding: 6px 10px; margin:0;">Add / إضافة</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW PAGES -->
+    <div id="garden" class="page hidden">
+      <h2>🌱 Virtual Garden / حديقتي الافتراضية</h2>
+      <div class="card" style="margin-bottom:20px;">
+        <h3>Plant a new seed / ازرع بذرة جديدة</h3>
+        <input type="text" id="vgName" placeholder="Plant name / اسم النبات" style="width:90%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ccc; text-align: center;">
+        <button id="addVgBtn">Plant / زراعة</button>
+      </div>
+      <div id="vgList" class="grid-list"></div>
+    </div>
+
+    <div id="calendar" class="page hidden">
+      <h2>📅 Seasonal Calendar / التقويم الزراعي</h2>
+      <div class="card" style="margin-bottom:20px; width:90%; max-width:400px;">
+        <h3 id="currentMonthName" style="color:#2a9d8f;"></h3>
+        <p>Best crops to plant right now: <br> أفضل المحاصيل للزراعة الآن:</p>
+      </div>
+      <div id="calendarList" class="grid-list"></div>
+    </div>
+
+    <div id="calculator" class="page hidden">
+      <h2>🧮 Fertilizer Calculator / حاسبة السماد</h2>
+      <div class="card" style="width:90%; max-width:400px; text-align:center;">
+        <label>Area Size / مساحة الأرض (m²):</label>
+        <input type="number" id="calcArea" placeholder="e.g. 10 / مثلاً 10" style="width:100%; padding:8px; margin-bottom:15px; border-radius:5px; border:1px solid #ccc; text-align: center;">
+        
+        <label>Crop Type / نوع المحصول:</label>
+        <select id="calcCrop" style="width:100%; padding:8px; margin-bottom:15px; border-radius:5px; border:1px solid #ccc; text-align: center;">
+          <option value="1.5">Vegetables / خضروات</option>
+          <option value="0.8">Herbs / أعشاب</option>
+          <option value="1.2">Fruits / فواكه</option>
+        </select>
+        
+        <button id="calcBtn" style="width:100%;">Calculate / احسب</button>
+        
+        <div id="calcResult" style="margin-top:15px; font-weight:bold; color:#2a9d8f; text-align:center;"></div>
+      </div>
+    </div>
+
+    <div id="encyclopedia" class="page hidden">
+      <h2>📚 Plant Encyclopedia / الموسوعة</h2>
+      <div id="encycList" class="grid-list"></div>
+    </div>
+
+    <div id="favorites" class="page hidden">
+      <h2>❤️ My Favorites / مفضلتي</h2>
+      <div class="card" style="margin-bottom:20px;">
+        <h3>Add Favorite Plant / إضافة نبات مفضل</h3>
+        <input type="text" id="favName" placeholder="Plant name / اسم النبات" style="width:90%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ccc; text-align: center;">
+        <button id="addFavBtn">Add / إضافة</button>
+      </div>
+      <div id="favList" class="grid-list"></div>
+    </div>
+
+    <div id="notes" class="page hidden">
+      <h2>📝 Keep Notes / ملاحظاتي</h2>
+      <div class="card" style="margin-bottom:20px;">
+        <h3>New Note / ملاحظة جديدة</h3>
+        <textarea id="noteText" placeholder="Write your note here... / اكتب ملاحظتك هنا..." rows="4" style="width:90%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ccc; text-align: right;"></textarea>
+        <button id="addNoteBtn">Save Note / حفظ</button>
+      </div>
+      <div id="notesList" class="notes-container"></div>
+    </div>
+
+    <div id="profile" class="page hidden">
+      <div class="card">
+        <h2>👤 Profile / حسابي</h2>
+        <p><strong>Email / الإيميل:</strong> <span id="profileEmail">user@example.com</span></p>
+      </div>
+    </div>
+
+    <div class="dots">
+      <span class="dot active" data-page="intro"></span>
+      <span class="dot" data-page="welcome"></span>
+      <span class="dot" data-page="diagnosis"></span>
+      <span class="dot" data-page="dailytip"></span>
+      <span class="dot" data-page="weather"></span>
+      <span class="dot" data-page="reminders"></span>
+      <span class="dot" data-page="garden"></span>
+      <span class="dot" data-page="calendar"></span>
+      <span class="dot" data-page="calculator"></span>
+      <span class="dot" data-page="encyclopedia"></span>
+      <span class="dot" data-page="favorites"></span>
+      <span class="dot" data-page="notes"></span>
+      <span class="dot" data-page="profile"></span>
+    </div>
+
+    <!-- CHATBOT UI -->
+    <div id="chatIcon" class="chat-fab">💬</div>
+    <div id="chatWindow" class="chat-window hidden">
+      <div class="chat-header">
+        <span>Agri Chatbot / الخبير الذكي</span>
+        <button id="closeChat">X</button>
+      </div>
+      <div id="chatBody" class="chat-body"></div>
+      <div class="chat-footer">
+        <input type="text" id="chatInput" placeholder="Ask me anything... / اسألني أي شيء...">
+        <button id="sendChat">➤</button>
+      </div>
+    </div>
+  </div> <!-- End Content Area -->
 </div>
 
 <script src="script.js"></script>
