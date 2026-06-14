@@ -1,0 +1,202 @@
+import os, zipfile, shutil
+zip_path_on_drive = '/content/drive/MyDrive/Dataset.Zip/plantvillage_detection.zip.zip'
+local_zip_path = '/content/dataset.zip'
+extract_dir = '/content/PlanetVillage_For_Object_Detection'
+
+if os.path.exists(zip_path_on_drive):
+    shutil.copy(zip_path_on_drive, local_zip_path)
+    with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
+        zip_ref.extractall(extract_dir)
+    print(f"🎉 تم فك الضغط في: {extract_dir}")
+    os.remove(local_zip_path)
+else:
+    print("❌ خطأ: يرجى التأكد من مسار الداتا سيت في جوجل درايف.")
+import os
+import glob
+import random
+import shutil
+import yaml
+from pathlib import Path
+
+dataset_src = '/content/PlanetVillage_For_Object_Detection'
+split_dest = '/content/split_dataset'
+colab_yaml_path = "/content/dataset.yaml"
+
+# حذف مجلد التقسيم القديم إن وجد للبدء من جديد بنظام
+if os.path.exists(split_dest):
+    print("🔄 جاري تنظيف مجلد التقسيم القديم...")
+    shutil.rmtree(split_dest)
+
+# إنشاء الهيكلية الثلاثية الجديدة
+folders = [
+    'images/train', 'images/val', 'images/test',
+    'labels/train', 'labels/val', 'labels/test'
+]
+for f in folders:
+    os.makedirs(os.path.join(split_dest, f), exist_ok=True)
+
+# 1. البحث عن الملفات ومطابقتها
+image_extensions = ('*.jpg', '*.jpeg', '*.png', '*.JPG', '*.JPEG', '*.PNG')
+all_images = []
+for ext in image_extensions:
+    all_images.extend(glob.glob(os.path.join(dataset_src, '**', ext), recursive=True))
+
+all_txts = glob.glob(os.path.join(dataset_src, '**', '*.txt'), recursive=True)
+txt_map = {os.path.splitext(os.path.basename(t))[0]: t for t in all_txts}
+
+valid_pairs = []
+for img_path in all_images:
+    img_name = os.path.splitext(os.path.basename(img_path))[0]
+    if img_name in txt_map:
+        valid_pairs.append((img_path, txt_map[img_name]))
+
+print(f"📷 إجمالي الصور المطابقة: {len(valid_pairs)}")
+
+# 2. تقسيم عشوائي بالنسب المطلوبة (70% تدريب - 10% تحقق - 20% اختبار)
+random.seed(42)
+random.shuffle(valid_pairs)
+
+n_total = len(valid_pairs)
+idx_train = int(n_total * 0.7)
+idx_val = int(n_total * 0.8)  # التدريب يأخذ من 0 لـ 70%، والتحقق من 70% لـ 80% (أي 10%)، والاختبار الباقي 20%
+
+train_pairs = valid_pairs[:idx_train]
+val_pairs = valid_pairs[idx_train:idx_val]
+test_pairs = valid_pairs[idx_val:]
+
+# 3. نقل الملفات للمجلدات الجديدة
+print("🔄 جاري توزيع ملفات التدريب (70%)...")
+for img, lbl in train_pairs:
+    shutil.copy(img, os.path.join(split_dest, 'images/train'))
+    shutil.copy(lbl, os.path.join(split_dest, 'labels/train'))
+
+print("🔄 جاري توزيع ملفات التحقق (10%)...")
+for img, lbl in val_pairs:
+    shutil.copy(img, os.path.join(split_dest, 'images/val'))
+    shutil.copy(lbl, os.path.join(split_dest, 'labels/val'))
+
+print("🔄 جاري توزيع ملفات الاختبار (20%)...")
+for img, lbl in test_pairs:
+    shutil.copy(img, os.path.join(split_dest, 'images/test'))
+    shutil.copy(lbl, os.path.join(split_dest, 'labels/test'))
+
+# 4. قراءة الكلاسات الأصلية
+class_names = {}
+num_classes = 0
+existing_yaml = list(Path(dataset_src).rglob("*.yaml"))
+classes_file = list(Path(dataset_src).rglob("classes.txt"))
+
+if existing_yaml:
+    try:
+        with open(existing_yaml[0], 'r') as f:
+            old_data = yaml.safe_load(f)
+            if old_data and 'names' in old_data:
+                class_names = old_data['names']
+                num_classes = old_data.get('nc', len(class_names))
+    except Exception as e:
+         print(f"تنبيه أثناء قراءة الـ YAML: {e}")
+
+if not class_names and classes_file:
+    try:
+        with open(classes_file[0], 'r') as f:
+            lines = [line.strip() for line in f.readlines() if line.strip()]
+            class_names = {i: name for i, name in enumerate(lines)}
+            num_classes = len(class_names)
+    except Exception as e:
+        print(f"تنبيه أثناء قراءة classes.txt: {e}")
+
+if not class_names:
+    class_names = {0: 'diseased_leaf', 1: 'healthy_leaf'}
+    num_classes = len(class_names)
+
+# 5. كتابة ملف YAML بالتقسيم الثلاثي
+yaml_data = {
+    'path': split_dest,
+    'train': 'images/train',
+    'val': 'images/val',
+    'test': 'images/test',  # المسار الثالث الجديد للاختبار
+    'nc': num_classes,
+    'names': class_names
+}
+
+with open(colab_yaml_path, 'w') as f:
+    yaml.safe_dump(yaml_data, f, default_flow_style=False)
+
+print("\n" + "═" * 60)
+print(f"🎉 تم التقسيم الثلاثي وإنشاء ملف الإعدادات بنجاح!")
+print(f"🔹 عدد صور التدريب (70%): {len(train_pairs)}")
+print(f"🔹 عدد صور التحقق (10%): {len(val_pairs)}")
+print(f"🔹 عدد صور الاختبار (20%): {len(test_pairs)}")
+print("═" * 60)
+from ultralytics import YOLO
+import pandas as pd
+from tabulate import tabulate
+from pathlib import Path
+import os
+from IPython.display import Image, display
+
+def print_epoch_summary_table(trainer):
+    try:
+        csv_path = Path(trainer.csv)
+        if csv_path.exists():
+            df = pd.read_csv(csv_path)
+            df.columns = [c.strip() for c in df.columns]
+            if not df.empty:
+                latest_row = df.iloc[-1]
+                epoch_num = int(latest_row.get("epoch", trainer.epoch + 1))
+                total_epochs = trainer.epochs
+
+                table_data = [
+                    ["Epoch", f"{epoch_num} / {total_epochs}"],
+                    ["Train Box Loss", f"{latest_row.get('train/box_loss', 0.0):.5f}"],
+                    ["Train Class Loss", f"{latest_row.get('train/cls_loss', 0.0):.5f}"],
+                    ["Val Box Loss", f"{latest_row.get('val/box_loss', 0.0):.5f}"],
+                    ["Val Class Loss", f"{latest_row.get('val/cls_loss', 0.0):.5f}"],
+                    ["Precision (الدقة)", f"{latest_row.get('metrics/precision(B)', 0.0):.5f}"],
+                    ["Recall (الاستدعاء)", f"{latest_row.get('metrics/recall(B)', 0.0):.5f}"],
+                    ["mAP @ 0.5", f"{latest_row.get('metrics/mAP50(B)', 0.0):.5f}"],
+                    ["mAP @ 0.5:0.95", f"{latest_row.get('metrics/mAP50-95(B)', 0.0):.5f}"]
+                ]
+                print("\n" + "═" * 70)
+                print(f" 📊 ملخص نتائج الـ Epoch رقم {epoch_num}")
+                print("═" * 70)
+                print(tabulate(table_data, headers=["المؤشر", "القيمة"], tablefmt="double_grid"))
+                print("═" * 70 + "\n")
+    except:
+        pass
+model = YOLO("yolo11s.pt")
+model.add_callback("on_fit_epoch_end", print_epoch_summary_table)
+run_dir = "/content/drive/MyDrive/PlantDisease_YOLOv11/yolo11_training_run"
+results = model.train(
+    data="/content/dataset.yaml",
+    epochs=20,
+    patience=10,
+    imgsz=416,
+    batch=16,
+    device=0,
+    workers=4,
+    project="/content/drive/MyDrive/PlantDisease_YOLOv11",
+    name="yolo11_training_run",
+    exist_ok=True,
+    val=True,
+    save=True,
+
+    dropout=0.15,
+    weight_decay=0.001,
+
+    degrees=15.0,
+    translate=0.1,
+    scale=0.5,
+    fliplr=0.5,
+    flipud=0.5,
+    hsv_h=0.015,
+    hsv_s=0.7,
+    hsv_v=0.4,
+    mosaic=1.0,
+    mixup=0.20
+)
+
+# 3. عرض الرسوم
+results_png = os.path.join(run_dir, 'results.png')
+if os.path.exists(results_png):
+    display(Image(filename=results_png, width=800))
