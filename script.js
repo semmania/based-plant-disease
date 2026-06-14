@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Navigation function
   function showPage(pageId) {
-    // Exclude login screen from normal navigation
+
     if(pageId === 'login') return;
 
     pages.forEach(p => {
@@ -33,13 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
       icon.classList.toggle('active', icon.dataset.page === pageId);
     });
 
-    // Update Dots active state
     dots.forEach(dot => {
       dot.classList.toggle('active', dot.dataset.page === pageId);
     });
   }
 
-  // Bind Sidebar & Dots
   sidebarIcons.forEach(icon => {
     icon.addEventListener('click', () => showPage(icon.dataset.page));
   });
@@ -47,14 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
     dot.addEventListener('click', () => showPage(dot.dataset.page));
   });
 
-  // Intro -> Welcome -> Diagnosis
   const continueBtn = document.getElementById('continueBtn');
   const startBtn = document.getElementById('start');
 
   if(continueBtn) continueBtn.addEventListener('click', () => showPage('welcome'));
   if(startBtn) startBtn.addEventListener('click', () => showPage('diagnosis'));
 
-  // Global window function for back buttons
+
   window.goBack = function(pageId) {
     showPage(pageId);
   };
@@ -191,15 +188,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 2. Seasonal Calendar
   const seasonalCrops = {
-    0: { name: "January / يناير", crops: ["Garlic / ثوم", "Onions / بصل", "Broad Beans / فول"] },
-    1: { name: "February / فبراير", crops: ["Potatoes / بطاطس", "Tomatoes / طماطم", "Cabbage / كرنب"] },
-    2: { name: "March / مارس", crops: ["Cucumber / خيار", "Pepper / فلفل", "Eggplant / باذنجان"] },
-    3: { name: "April / أبريل", crops: ["Watermelon / بطيخ", "Corn / ذرة", "Okra / بامية"] },
-    4: { name: "May / مايو", crops: ["Sweet Potato / بطاطا", "Zucchini / كوسة", "Beans / فاصوليا"] },
-    5: { name: "June / يونيو", crops: ["Melon / شمام", "Sunflower / عباد الشمس"] },
-    6: { name: "July / يوليو", crops: ["Maize / ذرة شامية", "Sorghum / ذرة رفيعة"] },
-    7: { name: "August / أغسطس", crops: ["Cabbage (Early) / كرنب مبكر", "Carrots / جزر"] },
-    8: { name: "September / سبتمبر", crops: ["Spinach / سبانخ", "Lettuce / خس", "Radish / فجل"] },
+    0: { name: "January / يناير", crops: ["جزر / carrot", "البسله / Peas", "Broad Beans / فول"," الخس / Lettuce"," جرجير / Watercress "] },
+    1: { name: "February / فبراير", crops: ["Potatoes / بطاطس", "Tomatoes / طماطم", "Cabbage / كرنب"," فجل / Radish "] },
+    2: { name: "March / مارس", crops: ["Cucumber / خيار", "Pepper / فلفل", "Eggplant / باذنجان"," ذره / Corn"] },
+    3: { name: "April / أبريل", crops: ["Watermelon / بطيخ", "Corn / ذرة", "Okra / بامية","فول الصويا / Soybean"] },
+    4: { name: "May / مايو", crops: ["Sweet Potato / بطاطا", "Zucchini / كوسة", "Beans / فاصوليا"," ارز / Rice"] },
+    5: { name: "June / يونيو", crops: ["Melon / شمام", "Sunflower / عباد الشمس","Eggplant / باذنجان","Zucchini / كوسة"] },
+    6: { name: "July / يوليو", crops: ["Maize / ذرة شامية", "Sorghum / ذرة رفيعة","اللوبيا / Cawpea"," السمسم / Sesame"] },
+    7: { name: "August / أغسطس", crops: ["Cabbage (Early) / كرنب مبكر", "Carrots / جزر","Okra / بامية","ملوخيه / Molokhia"] },
+    8: { name: "September / سبتمبر", crops: ["Spinach / سبانخ", "Lettuce / خس", "Radish / فجل"," بقدونس / Parsley"," كزبره / Goosebumps"] },
     9: { name: "October / أكتوبر", crops: ["Wheat / قمح", "Clover / برسيم", "Peas / بسلة"] },
     10: { name: "November / نوفمبر", crops: ["Broad Beans / فول بلدي", "Lentils / عدس"] },
     11: { name: "December / ديسمبر", crops: ["Strawberry / فراولة", "Artichoke / خرشوف"] }
